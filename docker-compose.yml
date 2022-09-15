@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+
+  code: 
+    image: python:latest
+    container_name: code
+    volumes:
+      - .:/code
+    working_dir: /code
+    command: sh -c "pip install -r requirements.txt && python HamStalker.py"
+    tty: true
+    stdin_open: true
+
+    environment:
+      -  PYTHONUNBUFFERED=1
+
+    depends_on:
+      torproxy:
+        condition: service_healthy
+    links: 
+        - torproxy
+
+
+  torproxy:
+    image: dperson/torproxy
+    container_name: torproxy
+    ports:
+      - 9050:9050
+      - 9051:9051
+    environment:
+      - PASSWORD=PASSWORD
+    restart: always
+
+    # logging:
+    #   driver: "none"
